@@ -2,7 +2,7 @@ from datetime import datetime
 
 def show_menu():
     print(
-    """===== ПЕРСОНАЛЬНИЙ МЕНЕДЖЕР ЗАВДАНЬ =====
+    """\n===== ПЕРСОНАЛЬНИЙ МЕНЕДЖЕР ЗАВДАНЬ =====
     1. Додати завдання
     2. Переглянути всі завдання
     3. Знайти завдання
@@ -91,7 +91,15 @@ def add_task(tasks):
         "status": "Нове"
     }
 
-def show_tasks():
+def show_tasks(tasks):
+    print("===== СПИСОК ЗАВДАНЬ =====\n")
+    if tasks == []:
+        print("Список завдань порожній. Виконайте команду \"1\", щоб додати завдання.")
+    else:
+        i = 0
+        for task in tasks:
+            i += 1
+            print( f"{i}. Назва: {task['task_name']}", f"Категорія: {task['category']}", f"Опис: {task['description']}", f"Пріоритет: {task['priority']}", f"Термін виконання: {task['deadline'].strftime('%d.%m.%Y')}", f"Статус: {task['status']}" + "\n", sep="\n")
     pass
 
 def search_tasks():
@@ -127,9 +135,8 @@ while True:
             task = add_task(tasks)
             tasks.append(task)
             print("Завдання додано успішно!")
-            print(tasks)
         case "2":
-            show_tasks()
+            show_tasks(tasks)
         case "3":
             search_tasks()
         case "4":
