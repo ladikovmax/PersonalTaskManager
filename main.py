@@ -83,6 +83,7 @@ def add_task(tasks):
             break
     
     return {
+        "task_id": len(tasks) + 1,
         "task_name": task_name,
         "category": category,
         "description": description,
@@ -96,13 +97,24 @@ def show_tasks(tasks):
     if tasks == []:
         print("Список завдань порожній. Виконайте команду \"1\", щоб додати завдання.")
     else:
-        i = 0
         for task in tasks:
-            i += 1
-            print( f"{i}. Назва: {task['task_name']}", f"Категорія: {task['category']}", f"Опис: {task['description']}", f"Пріоритет: {task['priority']}", f"Термін виконання: {task['deadline'].strftime('%d.%m.%Y')}", f"Статус: {task['status']}" + "\n", sep="\n")
+            print( f"{task['task_id']}. Назва: {task['task_name']}", f"Категорія: {task['category']}", f"Опис: {task['description']}", f"Пріоритет: {task['priority']}", f"Термін виконання: {task['deadline'].strftime('%d.%m.%Y')}", f"Статус: {task['status']}" + "\n", sep="\n")
     pass
 
-def search_tasks():
+def search_tasks(tasks):
+    query = input("Введіть слово або частину слова для пошуку(0 - повернутися до меню): ").strip()
+    if query == "0":
+        return
+    result = [
+        task for task in tasks
+        if any(query.casefold() in str(value).casefold() for value in task.values())
+    ]
+    if result:
+        for task in result:
+            print( f"{task['task_id']}. Назва: {task['task_name']}", f"Категорія: {task['category']}", f"Опис: {task['description']}", f"Пріоритет: {task['priority']}", f"Термін виконання: {task['deadline'].strftime('%d.%m.%Y')}", f"Статус: {task['status']}" + "\n", sep="\n")
+    else:
+        print("Завдання не знайдено.")
+
     pass
 
 def edit_task():
@@ -138,7 +150,7 @@ while True:
         case "2":
             show_tasks(tasks)
         case "3":
-            search_tasks()
+            search_tasks(tasks)
         case "4":
             edit_task()
         case "5":
