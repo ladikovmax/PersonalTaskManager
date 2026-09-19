@@ -117,7 +117,95 @@ def search_tasks(tasks):
 
     pass
 
-def edit_task():
+from datetime import datetime
+
+def edit_task(tasks):
+    while True:
+        raw_input = input("Введіть номер завдання для редагування (0 - повернутися до меню): ").strip()
+        if raw_input == "0":
+            return
+        try:
+            task_id = int(raw_input)
+            break
+        except ValueError:
+            print("Помилка: номер завдання має бути цілим числом. Спробуйте ще раз.")
+    task = next((t for t in tasks if t["task_id"] == task_id), None)
+    if not task:
+        print("Завдання з таким номером не знайдено.")
+        return
+
+    print(f"Редагування завдання: {task['task_name']}")
+    while True:
+        try:
+            new_name = input("Нова назва (залиште порожнім, щоб не змінювати): ").strip()
+            if not new_name:
+                break
+            if len(new_name) > 128:
+                raise ValueError("Назва завдання не може перевищувати 128 символів. Будь ласка, введіть коротшу назву завдання.")
+            if new_name.casefold() in [t["task_name"].casefold() for t in tasks if t["task_id"] != task["task_id"]]:
+                raise ValueError("Завдання з такою назвою вже існує. Будь ласка, введіть унікальну назву завдання.")
+            task["task_name"] = new_name
+        except ValueError as e:
+            print(e)
+        else:
+            break
+
+    while True:
+        try:
+            new_category = input("Нова категорія (залиште порожнім, щоб не змінювати): ").strip()
+            if not new_category:
+                break
+            if len(new_category) > 128:
+                raise ValueError("Категорія не може перевищувати 128 символів. Будь ласка, введіть коротшу категорію.")
+            task["category"] = new_category
+        except ValueError as e:
+            print(e)
+        else:
+            break
+
+    while True:
+        try:
+            new_description = input("Новий опис (залиште порожнім, щоб не змінювати): ").strip()
+            if not new_description:
+                break
+            if len(new_description) > 256:
+                raise ValueError("Короткий опис не може перевищувати 256 символів. Будь ласка, введіть коротший опис.")
+            task["description"] = new_description
+        except ValueError as e:
+            print(e)
+        else:
+            break
+
+    while True:
+        try:
+            new_priority = input("""Новий пріоритет (1-3, залиште порожнім, щоб не змінювати):
+            1. Високий
+            2. Середній
+            3. Низький
+            """).strip()
+            if not new_priority:
+                break
+            priority_val = int(new_priority)
+            if priority_val not in [1, 2, 3]:
+                raise ValueError
+            task["priority"] = priority_val
+        except ValueError:
+            print("Невірний пріоритет. Будь ласка, введіть число від 1 до 3.")
+        else:
+            break
+
+    while True:
+        new_deadline = input("Новий термін виконання (ДД.ММ.РРРР, залиште порожнім, щоб не змінювати): ").strip()
+        if not new_deadline:
+            break
+        try:
+            task["deadline"] = datetime.strptime(new_deadline, "%d.%m.%Y").date()
+        except ValueError:
+            print("Введіть коректну дату у форматі ДД.ММ.РРРР.")
+        else:
+            break
+
+    print("Завдання успішно відредаговано.")
     pass
 
 def change_status():
@@ -152,7 +240,8 @@ while True:
         case "3":
             search_tasks(tasks)
         case "4":
-            edit_task()
+            show_tasks(tasks)
+            edit_task(tasks)
         case "5":
             change_status()
         case "6":
