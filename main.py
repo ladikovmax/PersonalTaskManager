@@ -99,7 +99,7 @@ def add_task(tasks):
     print("Додати завдання. Введіть наступні дані для нового завдання:")
     task = input_task_data(tasks)
     task["task_id"] = len(tasks) + 1
-    task["status"] = "Нове"
+    task["status"] = "нове"
     return task
 
 def show_tasks(tasks):
@@ -148,8 +148,42 @@ def edit_task(tasks):
 
     print("Завдання успішно відредаговано.")
 
-def change_status():
-    pass
+def change_status(tasks):
+    if not tasks:
+        print("Список завдань порожній.")
+        return
+
+    show_tasks(tasks)
+    while True:
+        raw_input = input("Введіть номер завдання для зміни статусу (0 - повернутися до меню): ").strip()
+        if raw_input == "0":
+            return
+        try:
+            task_id = int(raw_input)
+            break
+        except ValueError:
+            print("Помилка: номер завдання має бути цілим числом. Спробуйте ще раз.")
+
+    task = next((t for t in tasks if t["task_id"] == task_id), None)
+    if task is None:
+        print("Завдання з таким номером не знайдено.")
+        return
+
+    print(f"Поточний статус завдання: {task['status']}")
+    statuses = {"1": "нове", "2": "у роботі", "3": "виконане"}
+    while True:
+        choice = input("""Оберіть новий статус (0 - повернутися до меню):
+        1. нове
+        2. у роботі
+        3. виконане
+        """).strip()
+        if choice == "0":
+            return
+        if choice in statuses:
+            task["status"] = statuses[choice]
+            print("Статус завдання успішно змінено.")
+            return
+        print("Невірний статус. Будь ласка, введіть число від 1 до 3.")
 
 def delete_task():
     pass
@@ -183,7 +217,7 @@ while True:
             show_tasks(tasks)
             edit_task(tasks)
         case "5":
-            change_status()
+            change_status(tasks)
         case "6":
             delete_task()
         case "7":
