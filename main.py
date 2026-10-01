@@ -215,8 +215,63 @@ def delete_task(tasks):
     else:
         print("Видалення скасовано.")
 
-def filter_tasks():
-    pass
+def filter_tasks(tasks):
+    if not tasks:
+        print("Список завдань порожній.")
+        return
+
+    choice = input("""Оберіть критерій фільтрації (0 - повернутися до меню):
+    1. Категорія
+    2. Статус
+    3. Пріоритет
+    """).strip()
+    if choice == "0":
+        return
+
+    if choice == "1":
+        category = input("Введіть категорію: ").strip()
+        if not category:
+            print("Категорія не може бути порожньою.")
+            return
+        result = [task for task in tasks if task["category"].casefold() == category.casefold()]
+    elif choice == "2":
+        status = input("""Оберіть статус (0 - повернутися до меню):
+        1. нове
+        2. у роботі
+        3. виконане
+        4. усі невиконані
+        """).strip()
+        if status == "0":
+            return
+        statuses = {"1": "нове", "2": "у роботі", "3": "виконане"}
+        if status == "4":
+            result = [task for task in tasks if task["status"] != "виконане"]
+        elif status in statuses:
+            result = [task for task in tasks if task["status"] == statuses[status]]
+        else:
+            print("Невірний статус. Будь ласка, введіть число від 1 до 4.")
+            return
+    elif choice == "3":
+        priority = input("""Оберіть пріоритет (0 - повернутися до меню):
+        1. Високий
+        2. Середній
+        3. Низький
+        """).strip()
+        if priority == "0":
+            return
+        if priority not in ["1", "2", "3"]:
+            print("Невірний пріоритет. Будь ласка, введіть число від 1 до 3.")
+            return
+        result = [task for task in tasks if task["priority"] == int(priority)]
+    else:
+        print("Невірний критерій фільтрації.")
+        return
+
+    print("===== РЕЗУЛЬТАТ ФІЛЬТРАЦІЇ =====")
+    if result:
+        show_tasks(result)
+    else:
+        print("Завдання за обраним критерієм не знайдено.")
 
 def sort_tasks():
     pass
@@ -248,7 +303,7 @@ while True:
         case "6":
             delete_task(tasks)
         case "7":
-            filter_tasks()
+            filter_tasks(tasks)
         case "8":
             sort_tasks()
         case "9":
