@@ -98,7 +98,7 @@ def input_task_data(tasks, current_task=None):
 def add_task(tasks):
     print("Додати завдання. Введіть наступні дані для нового завдання:")
     task = input_task_data(tasks)
-    task["task_id"] = len(tasks) + 1
+    task["task_id"] = max((t["task_id"] for t in tasks), default=0) + 1
     task["status"] = "нове"
     return task
 
@@ -185,8 +185,35 @@ def change_status(tasks):
             return
         print("Невірний статус. Будь ласка, введіть число від 1 до 3.")
 
-def delete_task():
-    pass
+def delete_task(tasks):
+    if not tasks:
+        print("Список завдань порожній.")
+        return
+
+    show_tasks(tasks)
+    while True:
+        raw_input = input("Введіть номер завдання для видалення (0 - повернутися до меню): ").strip()
+        if raw_input == "0":
+            return
+        try:
+            task_id = int(raw_input)
+            break
+        except ValueError:
+            print("Помилка: номер завдання має бути цілим числом. Спробуйте ще раз.")
+
+    task = next((t for t in tasks if t["task_id"] == task_id), None)
+    if task is None:
+        print("Завдання з таким номером не знайдено.")
+        return
+
+    print("Вибране завдання для видалення:")
+    show_tasks([task])
+    confirmation = input("Видалити це завдання? (так/ні): ").strip().lower()
+    if confirmation == "так":
+        tasks.remove(task)
+        print("Завдання успішно видалено.")
+    else:
+        print("Видалення скасовано.")
 
 def filter_tasks():
     pass
@@ -219,7 +246,7 @@ while True:
         case "5":
             change_status(tasks)
         case "6":
-            delete_task()
+            delete_task(tasks)
         case "7":
             filter_tasks()
         case "8":
