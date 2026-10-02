@@ -273,14 +273,46 @@ def filter_tasks(tasks):
     else:
         print("Завдання за обраним критерієм не знайдено.")
 
-def sort_tasks():
-    pass
+def sort_tasks(tasks):
+    if not tasks:
+        print("Список завдань порожній.")
+        return
+
+    choice = input("""Оберіть критерій сортування (0 - повернутися до меню):
+    1. Назва
+    2. Категорія
+    3. Пріоритет
+    4. Статус
+    """).strip()
+    if choice == "0":
+        return
+
+    if choice == "1":
+        result = sorted(tasks, key=lambda task: task["task_name"].casefold())
+    elif choice == "2":
+        result = sorted(tasks, key=lambda task: task["category"].casefold())
+    elif choice == "3":
+        result = sorted(tasks, key=lambda task: task["priority"])
+    elif choice == "4":
+        statuses = {"нове": 1, "у роботі": 2, "виконане": 3}
+        result = sorted(tasks, key=lambda task: statuses[task["status"]])
+    else:
+        print("Невірний критерій сортування.")
+        return
+
+    print("===== РЕЗУЛЬТАТ СОРТУВАННЯ =====")
+    show_tasks(result)
 
 def show_statistics():
     pass
 
-def show_priority_tasks():
-    pass
+def show_priority_tasks(tasks):
+    result = [task for task in tasks if task["priority"] == 1 and task["status"] != "виконане"]
+    print("===== ПРІОРИТЕТНІ ЗАВДАННЯ =====")
+    if result:
+        show_tasks(result)
+    else:
+        print("Невиконаних завдань із високим пріоритетом немає.")
 
 tasks = []
 while True:
@@ -305,11 +337,11 @@ while True:
         case "7":
             filter_tasks(tasks)
         case "8":
-            sort_tasks()
+            sort_tasks(tasks)
         case "9":
             show_statistics()
         case "10":
-            show_priority_tasks()
+            show_priority_tasks(tasks)
         case "0":
             print("Вийти з програми")
             break
