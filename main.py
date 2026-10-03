@@ -303,8 +303,58 @@ def sort_tasks(tasks):
     print("===== РЕЗУЛЬТАТ СОРТУВАННЯ =====")
     show_tasks(result)
 
-def show_statistics():
-    pass
+def show_statistics(tasks):
+    total = len(tasks)
+    completed = 0
+    in_progress = 0
+    new = 0
+    high_priority_unfinished = 0
+    categories = []
+    priorities = [0, 0, 0]
+
+    for task in tasks:
+        if task["status"] == "виконане":
+            completed += 1
+        elif task["status"] == "у роботі":
+            in_progress += 1
+        elif task["status"] == "нове":
+            new += 1
+
+        if task["priority"] == 1 and task["status"] != "виконане":
+            high_priority_unfinished += 1
+
+        if task["category"] not in categories:
+            categories.append(task["category"])
+        priorities[task["priority"] - 1] += 1
+
+    unfinished = total - completed
+    completed_percent = 0
+    if total > 0:
+        completed_percent = round(completed / total * 100, 2)
+
+    print("===== СТАТИСТИКА =====\n")
+    print(f"Усього завдань: {total}")
+    print(f"Виконано: {completed}")
+    print(f"Невиконано: {unfinished}")
+    print(f"У роботі: {in_progress}")
+    print(f"Нове: {new}")
+
+    print("\nЗа категоріями:")
+    if not categories:
+        print("Категорій немає.")
+    for category in categories:
+        count = 0
+        for task in tasks:
+            if task["category"] == category:
+                count += 1
+        print(f"{category}: {count}")
+
+    print("\nЗа пріоритетом:")
+    print(f"Високий: {priorities[0]}")
+    print(f"Середній: {priorities[1]}")
+    print(f"Низький: {priorities[2]}")
+    print(f"\nНевиконаних завдань із високим пріоритетом: {high_priority_unfinished}")
+    print(f"Частка виконаних завдань: {completed_percent:g}%")
 
 def show_priority_tasks(tasks):
     result = [task for task in tasks if task["priority"] == 1 and task["status"] != "виконане"]
@@ -339,7 +389,7 @@ while True:
         case "8":
             sort_tasks(tasks)
         case "9":
-            show_statistics()
+            show_statistics(tasks)
         case "10":
             show_priority_tasks(tasks)
         case "0":
