@@ -98,7 +98,7 @@ def input_task_data(tasks, current_task=None):
 def add_task(tasks):
     print("Додати завдання. Введіть наступні дані для нового завдання:")
     task = input_task_data(tasks)
-    task["task_id"] = max((t["task_id"] for t in tasks), default=0) + 1
+    task["task_id"] = max((task["task_id"] for task in tasks), default=0) + 1
     task["status"] = "нове"
     return task
 
@@ -137,7 +137,7 @@ def edit_task(tasks):
             break
         except ValueError:
             print("Помилка: номер завдання має бути цілим числом. Спробуйте ще раз.")
-    task = next((t for t in tasks if t["task_id"] == task_id), None)
+    task = next((task for task in tasks if task["task_id"] == task_id), None)
     if not task:
         print("Завдання з таким номером не знайдено.")
         return
@@ -164,7 +164,7 @@ def change_status(tasks):
         except ValueError:
             print("Помилка: номер завдання має бути цілим числом. Спробуйте ще раз.")
 
-    task = next((t for t in tasks if t["task_id"] == task_id), None)
+    task = next((task for task in tasks if task["task_id"] == task_id), None)
     if task is None:
         print("Завдання з таким номером не знайдено.")
         return
@@ -201,7 +201,7 @@ def delete_task(tasks):
         except ValueError:
             print("Помилка: номер завдання має бути цілим числом. Спробуйте ще раз.")
 
-    task = next((t for t in tasks if t["task_id"] == task_id), None)
+    task = next((task for task in tasks if task["task_id"] == task_id), None)
     if task is None:
         print("Завдання з таким номером не знайдено.")
         return
@@ -287,18 +287,22 @@ def sort_tasks(tasks):
     if choice == "0":
         return
 
-    if choice == "1":
-        result = sorted(tasks, key=lambda task: task["task_name"].casefold())
-    elif choice == "2":
-        result = sorted(tasks, key=lambda task: task["category"].casefold())
-    elif choice == "3":
-        result = sorted(tasks, key=lambda task: task["priority"])
-    elif choice == "4":
-        statuses = {"нове": 1, "у роботі": 2, "виконане": 3}
-        result = sorted(tasks, key=lambda task: statuses[task["status"]])
-    else:
+    if choice not in ["1", "2", "3", "4"]:
         print("Невірний критерій сортування.")
         return
+
+    def get_sort_value(task):
+        if choice == "1":
+            return task["task_name"].casefold()
+        elif choice == "2":
+            return task["category"].casefold()
+        elif choice == "3":
+            return task["priority"]
+        else:
+            status_order = {"нове": 1, "у роботі": 2, "виконане": 3}
+            return status_order[task["status"]]
+
+    result = sorted(tasks, key=get_sort_value)
 
     print("===== РЕЗУЛЬТАТ СОРТУВАННЯ =====")
     show_tasks(result)
@@ -310,7 +314,9 @@ def show_statistics(tasks):
     new = 0
     high_priority_unfinished = 0
     categories = []
-    priorities = [0, 0, 0]
+    high_priority = 0
+    medium_priority = 0
+    low_priority = 0
 
     for task in tasks:
         if task["status"] == "виконане":
@@ -320,12 +326,17 @@ def show_statistics(tasks):
         elif task["status"] == "нове":
             new += 1
 
-        if task["priority"] == 1 and task["status"] != "виконане":
-            high_priority_unfinished += 1
+        if task["priority"] == 1:
+            high_priority += 1
+            if task["status"] != "виконане":
+                high_priority_unfinished += 1
+        elif task["priority"] == 2:
+            medium_priority += 1
+        elif task["priority"] == 3:
+            low_priority += 1
 
         if task["category"] not in categories:
             categories.append(task["category"])
-        priorities[task["priority"] - 1] += 1
 
     unfinished = total - completed
     completed_percent = 0
@@ -350,9 +361,9 @@ def show_statistics(tasks):
         print(f"{category}: {count}")
 
     print("\nЗа пріоритетом:")
-    print(f"Високий: {priorities[0]}")
-    print(f"Середній: {priorities[1]}")
-    print(f"Низький: {priorities[2]}")
+    print(f"Високий: {high_priority}")
+    print(f"Середній: {medium_priority}")
+    print(f"Низький: {low_priority}")
     print(f"\nНевиконаних завдань із високим пріоритетом: {high_priority_unfinished}")
     print(f"Частка виконаних завдань: {completed_percent:g}%")
 
