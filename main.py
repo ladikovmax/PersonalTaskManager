@@ -64,7 +64,7 @@ def input_task_data(tasks, current_task=None):
             2. Середній
             3. Низький
             """).strip() or current_task.get("priority", ""))
-            if priority not in [1, 2, 3]:
+            if priority not in (1, 2, 3):
                 raise ValueError
         except ValueError:
             print("Невірний пріоритет. Будь ласка, введіть число від 1 до 3.")
@@ -112,6 +112,9 @@ def show_tasks(tasks):
     pass
 
 def search_tasks(tasks):
+    if not tasks:
+        print("Список завдань порожній.")
+        return
     query = input("Введіть слово або частину слова для пошуку(0 - повернутися до меню): ").strip()
     if query == "0":
         return
@@ -128,6 +131,11 @@ def search_tasks(tasks):
     pass
 
 def edit_task(tasks):
+    if not tasks:
+        print("Список завдань порожній.")
+        return
+    else:
+        show_tasks(tasks)
     while True:
         raw_input = input("Введіть номер завдання для редагування (0 - повернутися до меню): ").strip()
         if raw_input == "0":
@@ -136,7 +144,7 @@ def edit_task(tasks):
             task_id = int(raw_input)
             break
         except ValueError:
-            print("Помилка: номер завдання має бути цілим числом. Спробуйте ще раз.")
+            print("Номер завдання має бути цілим числом. Спробуйте ще раз.")
     task = next((task for task in tasks if task["task_id"] == task_id), None)
     if not task:
         print("Завдання з таким номером не знайдено.")
@@ -162,7 +170,7 @@ def change_status(tasks):
             task_id = int(raw_input)
             break
         except ValueError:
-            print("Помилка: номер завдання має бути цілим числом. Спробуйте ще раз.")
+            print("Номер завдання має бути цілим числом. Спробуйте ще раз.")
 
     task = next((task for task in tasks if task["task_id"] == task_id), None)
     if task is None:
@@ -199,7 +207,7 @@ def delete_task(tasks):
             task_id = int(raw_input)
             break
         except ValueError:
-            print("Помилка: номер завдання має бути цілим числом. Спробуйте ще раз.")
+            print("Номер завдання має бути цілим числом. Спробуйте ще раз.")
 
     task = next((task for task in tasks if task["task_id"] == task_id), None)
     if task is None:
@@ -259,7 +267,7 @@ def filter_tasks(tasks):
         """).strip()
         if priority == "0":
             return
-        if priority not in ["1", "2", "3"]:
+        if priority not in ("1", "2", "3"):
             print("Невірний пріоритет. Будь ласка, введіть число від 1 до 3.")
             return
         result = [task for task in tasks if task["priority"] == int(priority)]
@@ -287,7 +295,7 @@ def sort_tasks(tasks):
     if choice == "0":
         return
 
-    if choice not in ["1", "2", "3", "4"]:
+    if choice not in ("1", "2", "3", "4"):
         print("Невірний критерій сортування.")
         return
 
@@ -389,7 +397,6 @@ while True:
         case "3":
             search_tasks(tasks)
         case "4":
-            show_tasks(tasks)
             edit_task(tasks)
         case "5":
             change_status(tasks)
